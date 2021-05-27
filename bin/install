@@ -43,7 +43,7 @@ install_hygen_cli() {
   curl -sL $download_url -o $tmp_bin_path
 
   echo "Extracting ${tmp_bin_path}"
-  if [[ $filename == *tgz ]]
+  if [[ $filename == *tar.gz ]]
   then
     tar -zxf $tmp_bin_path --directory $tmp_path
   else
@@ -51,7 +51,12 @@ install_hygen_cli() {
   fi
 
   echo "Moving bin to ${bin_path}"
-  cp $tmp_path/hygen-files/hygen $bin_path
+  if [[ $filename == *tar.gz ]]
+  then
+    cp $tmp_path/hygen-files/hygen $bin_path
+  else
+    cp $tmp_path/artifacts/hygen $bin_path
+  fi
 
   echo "Cleaning tmps..."
   rm -rf $tmp_path $tmp_bin_path
