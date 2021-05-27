@@ -53,9 +53,9 @@ install_hygen_cli() {
   echo "Moving bin to ${bin_path}"
   if [[ $filename == *tar.gz ]]
   then
-    cp $tmp_path/hygen-files/hygen $bin_path
+    cp $tmp_path/hygen $bin_path
   else
-    cp $tmp_path/artifacts/hygen $bin_path
+    cp $tmp_path/hygen $bin_path
   fi
 
   echo "Cleaning tmps..."
