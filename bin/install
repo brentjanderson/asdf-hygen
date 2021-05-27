@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+ASDF_INSTALL_TYPE=${ASDF_INSTALL_TYPE:-version  }
+TMPDIR=${TMPDIR:-/tmp}
+[ -n "$ASDF_INSTALL_VERSION" ] || (>&2 echo 'Missing ASDF_INSTALL_VERSION' && exit 1)
+[ -n "$ASDF_INSTALL_PATH" ] || (>&2 echo 'Missing ASDF_INSTALL_PATH' && exit 1)
+
+install_hygen_cli() {
+  local install_type=$1
+  local version=$2
+  local install_path=$3
+
+  local bin_install_path="$install_path/bin"
+  local bin_path="${bin_install_path}/hygen"
+
+    case $(uname | tr '[:upper:]' '[:lower:]') in
+        linux*)
+        local filename=hygen.linux.v${version}.tar.gz
+        local platform=linux
+        ;;
+        darwin*)
+        local filename=hygen.macos.v${version}.tar.gz
+        local platform=macos
+        ;;
+        *)
+            echo "Unknown platform $(uname) not supported"
+            exit 1
+        ;;
+    esac
+
+  local old_filename="hygen_${version}_${platform}"
+  local download_url="$(get_download_url $filename)"
+  local tmp_bin_path="${TMPDIR}/${filename}"
+  local tmp_path="${TMPDIR}/hygen"
+
+  mkdir -p $tmp_path
+
+  echo "Downloading hygen-cli from ${download_url}"
+  mkdir -p $bin_install_path
+  curl -sL $download_url -o $tmp_bin_path
+
+  echo "Extracting ${tmp_bin_path}"
+  if [[ $filename == *tgz ]]
+  then
+    tar -zxf $tmp_bin_path --directory $tmp_path
+  else
+    unzip -o $tmp_bin_path -d $tmp_path
+  fi
+
+  echo "Moving bin to ${bin_path}"
+  cp $tmp_path/hygen-files/hygen $bin_path
+
+  echo "Cleaning tmps..."
+  rm -rf $tmp_path $tmp_bin_path
+
+  echo "Run: asdf current hygen-cli ${version}"
+  chmod a+x $bin_path
+}
+
+get_download_url() {
+  local filename="$1"
+  echo "https://github.com/jondot/hygen/releases/download/v${version}/${filename}"
+}
+
+install_hygen_cli $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH

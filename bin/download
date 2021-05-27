@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -eu
+[ "${BASH_VERSINFO[0]}" -ge 3 ] && set -o pipefail
+
+get_platform () {
+    local platform=""
+
+    case $(uname | tr '[:upper:]' '[:lower:]') in
+        linux*)
+        local platform=linux
+        ;;
+        darwin*)
+        local platform=macos
+        ;;
+        *)
+            echo "Unknown platform $(uname) not supported"
+            exit 1
+        ;;
+    esac
+
+    echo -n $platform
+}
+
+get_file_suffix () {
+    local suffix=""
+
+    # TODO Support windows
+    case $(uname | tr '[:upper:]' '[:lower:]') in
+        linux*)
+        local suffix=tar.gz
+        ;;
+        darwin*)
+        local suffix=tar.gz
+        ;;
+        *)
+            echo "Unknown platform $(uname) not supported"
+            exit 1
+        ;;
+    esac
+
+    echo -n $suffix
+}
+
+download_hygen () {
+    local version=$1
+    local download_path=$2
+    local platform=$(get_platform)
+    local suffix=$(get_file_suffix)
+
+    curl -sL "https://github.com/jondot/hygen/releases/download/v${version}/hygen.${platform}.v${version}.${suffix}" -o "${download_path}/archive"
+    
+    exit 0
+}
+
+download_hygen "$ASDF_INSTALL_VERSION" "$ASDF_DOWNLOAD_PATH"
