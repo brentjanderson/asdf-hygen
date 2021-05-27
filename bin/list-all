@@ -19,7 +19,7 @@ list_versions() {
   cmd="curl -fsS --url $RELEASES_URL"
   [ -n "$GITHUB_API_TOKEN" ] && cmd+=" -H 'Authorization: token $GITHUB_API_TOKEN'"
 
-  echo "$(eval $cmd | grep -oE "tag_name\": *\"v[0-9].*\"," | grep -vE "(v3\.[3-9]|v[4-9]).*" | sed 's/tag_name\": *\"v//;s/\",//')"
+  echo "$(eval $cmd | grep -oE "tag_name\": *\"v[0-9].*\"," | sed 's/tag_name\": *\"v//;s/\",//')"
 }
 
 #
